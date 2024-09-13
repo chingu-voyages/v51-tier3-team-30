@@ -35,4 +35,4 @@ your repo access and to practice PR'ing with your team _before_ you start
 coding!
 
 - Riry Nomenajanahary #1: [GitHub](https://github.com/TiaDev7474) / [LinkedIn](https://linkedin.com/in/riry-nomenjanahary-a47a85264)
-- Teammate name #2: [GitHub](https://github.com/Ron1373/) / [LinkedIn](https://www.linkedin.com/in/ronaldo-shrestha-170255128/)
+- Ronaldo Shrestha #2: [GitHub](https://github.com/Ron1373/) / [LinkedIn](https://www.linkedin.com/in/ronaldo-shrestha-170255128/)
