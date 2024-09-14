@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String        @id @db.Uuid
+    username      String        @unique
+    password_hash String?
+    firstname     String?
+    lastname      String?
+    email         String?
+    created_at    DateTime      @default(now())
+    updated_at    DateTime      @updatedAt
+    account       Account[]
+    group         Group[]
+    GroupMember   GroupMember[]
+
+    @@index([email])
+}
+
+model Account {
+    id                  String   @id @db.Uuid
+    provider            String
+    provider_account_id String
+    user_id             String   @db.Uuid
+    user                User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    active              Boolean
+    created_at          DateTime @default(now())
+
+    @@unique([provider, provider_account_id])
+    @@map("accounts")
+}
+
+model Group {
+    id                String        @id @db.Uuid
+    creator_id        String        @db.Uuid
+    creator           User          @relation(fields: [creator_id], references: [id])
+    group_name        String        @db.VarChar(255)
+    group_description String        @db.Text
+    group_budget      Decimal       @db.Decimal(10, 2)
+    group_links       GroupLink[]
+    group_members     GroupMember[]
+}
+
+model GroupLink {
+    id          Int      @id @default(autoincrement())
+    link        String
+    expireAt    DateTime
+    isPermanent Boolean  @default(true)
+    group_id    String   @db.Uuid
+    group       Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+}
+
+model GroupMember {
+    id        String   @id @db.Uuid
+    group_id  String   @db.Uuid
+    group     Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+    member_id String   @db.Uuid
+    member    User     @relation(fields: [member_id], references: [id])
+    join_at   DateTime @default(now())
+}
