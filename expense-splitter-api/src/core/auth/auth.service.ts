@@ -32,7 +32,7 @@ export class AuthService {
             (foundUser!== null &&
                 (await this.validatePassword(
                     input.password,
-                    foundUser.password_hash,
+                    foundUser.password_hash!,
                 )));
         if(!isValidUser){
             return null
