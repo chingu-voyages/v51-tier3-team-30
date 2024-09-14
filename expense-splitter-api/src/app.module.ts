@@ -12,7 +12,7 @@ import {LoggerMiddleware} from "./common/middlewares/logger.middleware";
 
 
 @Module({
-    imports: [CoreModule, CommonModule, CoreModule, ExpenseModule, ExpenseGroupModule, CalculationsModule, ReceiptModule, AnalyticsModule, ExportModule, PrismaModule],
+    imports: [CoreModule, CommonModule, ExpenseModule, ExpenseGroupModule, CalculationsModule, ReceiptModule, AnalyticsModule, ExportModule, PrismaModule],
 })
 export class AppModule implements NestModule{
     configure(consumer: MiddlewareConsumer) {
