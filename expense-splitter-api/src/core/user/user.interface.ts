@@ -1,12 +1,16 @@
+
 export interface User {
     id: string;
     username: string;
-    firstname: string | null;
-    lastname :  string | null;
+    firstName: string | null;
+    lastName :  string | null;
     email: string | null;
-    password_hash: string | null;
-    created_at: string | Date;
-    updated_at: string | Date;
+    passwordHash: string | null;
+    createdAt: string | Date;
+    updatedAt: string | Date;
 }
 
-export interface SafeUser extends Omit<User , 'password_hash'>{}
+export interface SafeUser extends Omit<User , 'passwordHash'>{}
+
+
+
