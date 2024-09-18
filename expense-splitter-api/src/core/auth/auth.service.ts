@@ -1,14 +1,21 @@
-import {HttpStatus , Injectable , InternalServerErrorException , UnauthorizedException} from "@nestjs/common";
-import {AuthResult} from "./auth.interface";
+import {
+    BadRequestException ,
+    HttpStatus ,
+    Injectable ,
+    InternalServerErrorException ,
+    UnauthorizedException
+} from "@nestjs/common";
+import  type {AuthResult , OauthUserInput} from "./auth.interface";
 import {UserService} from "../user/user.service";
 import {AuthDto} from "./dtos/auth.dto";
-import {AuthMessage} from "./config/login.config";
+import {AuthMessage} from "./config/auth.config";
 import {User} from "../user/user.interface";
-import * as bcrypt from "bcrypt";
 import {formatApiResponse} from "../../common/utils/format-api-response";
 import {JwtService} from "@nestjs/jwt";
 import {ApiResponse} from "../../common/types/response.types";
 
+import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from "bcrypt";
 
 
 
@@ -32,7 +39,7 @@ export class AuthService {
             (foundUser!== null &&
                 (await this.validatePassword(
                     input.password,
-                    foundUser.password_hash!,
+                    foundUser.passwordHash!,
                 )));
         if(!isValidUser){
             return null
@@ -40,7 +47,7 @@ export class AuthService {
         return foundUser
     }
     async signIn(user: User): Promise<ApiResponse<AuthResult>>{
-        const payload: Record<string , string> = { sub: user.id, username: user.username}
+        const payload: Record<string , string> = { sub: user.id, username: user.username }
         return formatApiResponse(
             {
                 access_token: await this.jwtService.signAsync(payload)
@@ -50,6 +57,30 @@ export class AuthService {
         )
     }
 
+    async findOrCreateUser(oauthUserInput : OauthUserInput) {
+        const { provider,providerAccountId, ...rest} = oauthUserInput
+        if(!oauthUserInput){
+            throw new BadRequestException('Unauthenticated')
+        }
+        const foundUser = await  this.userService.findUserByEmail(rest.email);
+        if(!foundUser){
+            const newUser = await this.userService.saveUser({
+                id: uuidv4(),
+                accounts: {
+                    create: {
+                        id: uuidv4(),
+                        provider: provider,
+                        providerAccountId: providerAccountId,
+                    }
+                },
+                ...rest,
+            });
+
+            return await this.signIn(newUser as User)
+
+        }
+        return await this.signIn(foundUser as User)
+    }
     async signUp(username: string, password: string, email: string): Promise<ApiResponse<null>>
     {
         const hashedPassword = await bcrypt.hash(password, 10);
